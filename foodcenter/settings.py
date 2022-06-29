@@ -26,7 +26,7 @@ SECRET_KEY = 'dj2hpgml!w9s5j@trrq&90lecmf(&i+!q-$(vz*)*(6%t6k^g0'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['foodcenter.azurewebsites.net','127.0.0.1','localhost']
 
 STRIPE_PUB_KEY = 'pk_test_51IUQmODVezC5smoeZBW3HiFvKro6vInLteQdxCKRrVm63jW459xJFEN6m1vqGwp8YnOedefkvB0JDdRk6RbdJATW003YtizMN8'
 STRIPE_SECRET_KEY = 'sk_test_51IUQmODVezC5smoeVrJw1yz6X1G4qrQJXHPJ3bv4D2jDTDzMuGrj1HyFcLTZLOphNcRD6CZdJt3nnNvRYyLfDYoD00NpR2N4rc'
