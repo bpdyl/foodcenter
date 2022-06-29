@@ -1,0 +1,86 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block core_head %}
+<style>
+    .notfound{
+        background-image: linear-gradient(to bottom left,red ,blue,yellow),url('static/core/images/notfound.jpg');
+        height: 250px;
+        width: 50%;
+        margin-left: 20%;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="latest-products">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="section-heading">
+            <h2>{{heading}}</h2>
+            <hr>
+          </div>
+        </div>
+        {% for rest in restaurant %}
+        <div class="col-md-3">
+          <div class="product-item">
+            <div class="img-hover-zoom">
+            <a href="{% url 'view_detail' rest.id %}"><img src="{{rest.rest_photo.url}}" class="img-responsive img-fluid"  alt=""></a>
+            </div>
+            <div class="down-content">
+              <a href="{% url 'view_detail' rest.id %}"><h4>{{rest.rest_name}}</h4></a>
+  
+              <h6>{{rest.rest_opentime}} - {{rest.rest_closetime}}</h6>
+  
+              <p>{{rest.rest_Address}}</p>
+              {% if rest.check_time and rest.status == "open" %}
+              <small style="color: rgb(5, 184, 5); font-size: 15px;">
+                 <i class="fa fa-clock-o" aria-hidden="true"></i> Opened 
+                  <small style="color: black;font-size: 14px;">{{rest.rest_opentime}} - {{rest.rest_closetime}}</small>
+                  <br>
+              </small>
+              {% else %}
+              <p style="color: red;"><i class="fa fa-clock-o" aria-hidden="true"></i> Closed</p>
+              {% endif %}
+              <small>
+                   <strong title="City"><i class="fa fa-map-marker"></i> {{rest.city}}</strong> &nbsp;&nbsp;&nbsp;&nbsp;
+              </small>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% if all_rest %}
+            {% for rest in all_rest %}
+            <div class="col-md-3">
+                <div class="product-item">
+                  <div class="img-hover-zoom">
+                  <a href="{% url 'view_detail' rest.id %}"><img src="{{rest.rest_photo.url}}" class="img-responsive img-fluid"  alt=""></a>
+                  </div>
+                  <div class="down-content">
+                    <a href="{% url 'view_detail' rest.id %}"><h4>{{rest.rest_name}}</h4></a>
+                    <p>{{rest.rest_Address}}</p>
+                    {% if rest.check_time and rest.status == "open" %}
+                    <small style="color: rgb(5, 184, 5); font-size: 15px;">
+                       <i class="fa fa-clock-o" aria-hidden="true"></i> Opened 
+                        <small style="color: rgb(121, 116, 116);font-size: 14px;">{{rest.rest_opentime}} - {{rest.rest_closetime}}</small>
+                        <br>
+                    </small>
+                    {% else %}
+                    <p style="color: red;"><i class="fa fa-clock-o" aria-hidden="true"></i> Closed</p>
+                    {% endif %}
+                    <small>
+                         <strong title="City"><i class="fa fa-map-marker"></i> {{rest.city}}</strong> &nbsp;&nbsp;&nbsp;&nbsp;
+                    </small>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}        
+        {% else %}
+        {% if not restaurant %}
+        <img src="{% static 'core/images/notfound.jpg' %}" class="notfound" alt="">
+        <strong style="text-align: center; margin-left:15%;font-size: 24px; color: rgb(192, 53, 48);"> No restaurants found with your search criteria. Please try again !!</strong>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

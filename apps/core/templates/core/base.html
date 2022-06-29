@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>FoodCenter</title>
+	{% load static %}
+	{% load app_tags %}
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta content="width=device-width, initial-scale=1.0" name="viewport">
+	<meta content="" name="keywords">
+	<meta content="" name="description">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.0.3/css/dataTables.dateTime.min.css">
+	<link rel="stylesheet" href="	https://cdn.datatables.net/responsive/2.2.7/css/responsive.bootstrap.css">
+	<link href="{% static 'core/images/favicon.png' %}" rel="icon">
+	
+	<!--//tags -->
+	<style>
+		body {
+  table-layout: fixed;
+}
+	.dt-button{
+    margin-bottom: 10px;
+    border-radius: 50px;
+    background: #ffffff;
+    border: 1px solid #007bff;
+    color: #007bff;
+    transition: all .4s ease;
+
+	}
+	.dt-button:hover{
+		transition: all .4s ease;
+		background: #007bff;
+		color: #fff;
+		
+	}
+	.dataTables_length{
+	margin-bottom: 5px;
+    border-radius: 50px;
+    color: #007bff;
+    transition: all .4s ease;
+	}
+.navhover:link, .navhover:visited {
+  color: black;
+  padding: 5px;
+  font-weight:bold;
+  font-family: cursive;
+  text-align: center;
+  color: #fff;
+  text-decoration: cornsilk;
+  display: inline-block;
+}
+.cartbutton{
+	background-color: inherit;
+}
+.navhover:hover, .navhover:active {
+  /* background-color: rgb(68, 168, 55); */
+  color:rgb(14, 187, 255);
+  text-underline-position: below;
+}
+	</style>
+	<link href="{% static 'core/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" media="all" />
+	<link href="{% static 'core/css/style.css' %}" rel="stylesheet" type="text/css" media="all" />
+	<link href="{% static 'restaurants/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+	{% block core_head %}
+	{% endblock core_head %}
+</head>
+
+<body>
+	<nav class="main_nav" id="main_nav">
+		<div class="container">
+			<div class="nav_links">
+				<a href="{% url 'home' %}" class="logo">FoodCenter</i></a>
+				{% block navsearch %}
+				<form class="form-inline my-2 my-lg-0 serch" action="/search/index">
+					<input class="form-control mr-sm-2" type="search" placeholder="Search for Anything You Want"
+						aria-label="Search" name="query">
+					<button class="btn" type="submit" style="margin: 0;"><i class="fa fa-search"
+							aria-hidden="true"></i></button>
+				</form>
+				{% endblock %}
+			</div>
+			<div class="user_links pt-1">
+				{% if request.user.is_authenticated %}
+				<button id="popcart" class="btn btn-secondary cartbutton" data-container="body" 
+				data-toggle="popover" style="font-size: 22px; color: #fff; margin-right: 20px; background-color: transparent; border: none;" data-placement="bottom" data-html="true" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus."><i
+				class="fa fa-shopping-cart" aria-hidden="true"></i><sup><span class="badge"
+					id="cart_no">{{cart_element_no}}</span></sup></button>
+				<!-- <a href="{% url 'main_cart' %}" style="font-size: 22px; color: #fff; margin-right: 20px;"><i
+						class="fa fa-shopping-cart" aria-hidden="true"></i><sup><span class="badge"
+							id="cart_no">{{cart_element_no}}</span></sup></a> -->
+				<a href="##" data-container="body" data-toggle="popover" data-placement="bottom" data-trigger="focus"
+					data-html="true"
+					data-content="<a href='{% url 'myorders' %}'>My Order</a><br><a href='{% url 'account_settings' %}'>Account Settings</a>"><img
+						src="{{request.user.userdetail.photo.url}}"
+						style="height: 20px; width: 20px; border-radius: 10px; margin-right: 3px;">{{request.user.first_name}}</a>&nbsp;|
+				<a href="{% url 'logout' %}">Logout</a>
+				{% else %}
+				<a class="navhover" href="{% url 'login' %}">Login</a>&nbsp;|
+				<a class="navhover" href="{% url 'signup' %}">Register</a>&nbsp;|
+				<a class="navhover" href="{% url 'restaurant_signup' %}">Restaurant</a>
+				{% endif %}
+			</div>
+		</div>
+	</nav>
+
+	<main class="" id="menu_close">
+		{% block content %}
+		{% endblock %}
+		{% block core_body %}
+		{% endblock core_body %}
+	</main>
+	{% block core_script %}
+	{% endblock core_script %}
+
+	<!-- Add to cart -->
+	<script src="{%static 'core/js/sweetalert.min.js' %}"></script>
+	{% if request.user.is_authenticated %}
+	<script type="text/javascript">
+		$('.add_to_cart').click(function () {
+			var id = $(this).attr("foodId");
+			var restid = $(this).attr("restId")
+			$.ajax(
+				{
+					type: "GET",
+					url: "/add_to_cart",
+					data: {
+						foodId: id,
+						restId: restid,
+					},
+					success: function (data) {
+						console.log(data);
+						if(data.status === 0){
+							swal({
+								"title":"Your cart contains items from a different restaurant. Would you like to reset your cart before browsing this restaurant?",
+								"icon":"error",
+								buttons: ["No","Reset"],
+								dangerMode: true,
+							})
+							.then(function(result){
+								if(result){
+									console.log("success")
+									var url = "/reset_cart/"
+									fetch(url,{
+										method:'POST',
+										headers:{
+											'Content-Type':'application/json',
+										},
+										body:JSON.stringify({'restId':restid})
+									})
+									.then((response) => {
+										return response.json();
+									})
+									.then((data) => {
+										console.log(data);
+										if(data.status =='removed'){
+											location.reload();
+										}
+									});
+								}
+							})
+						}
+						$('#emptycart').fadeOut(500).hide();
+						function buildCart(data){
+							var myupdatingdiv = document.getElementById('updatingDiv');
+							for (var i = 0; i < data.length; i++){
+								var cartdiv = `<div class="row mb-0 mt-sm-0 align-items-center">
+                                        <div class="pr-0 col-xl-6 col-5">
+                                            <h4>${data[i]}</h4>
+                                        </div> 
+                                        <div class="qty-custom-width count mt-0 pl-2 pr-2 col-md-auto">
+                                            
+                                                <button type="button" id="negative{{c.id}}" data-action="minus" class="icon-remove pr-0 button1 update-cart"
+                                                 foodId = {{c.id}} cartfoodid = {{food.id}} {% if c.number < 2 %} disabled {% endif %} ></button>
+                                                <strong style="padding-left: 10px;" >{{c.number}}</strong>
+                                                <button type="button" id="positive" cartfoodid = {{food.id}} data-action="plus" class="icon-add pr-0 button2 update-cart" foodId = {{c.id}}></button>
+                                        </div> 
+                                        <div class="prc-custom-width text-right pl-0 col-md-auto">
+                                            <p id="food{{food.id}}">Rs.100</p>
+                                        </div>
+                                    </div> 
+                                    <div class="row mt-1">
+                                        <div class="pr-0 col">
+                                            <a href="#" target="_self" data-action="remove" class="delete-note remove-cart" foodId = {{c.id}}>
+                                                    Remove
+                                            </a>
+                                        </div>
+                                    </div>
+												
+								`
+							}
+						}
+						cart_items = data.cart_data;
+						for (const item in cart_items){
+							let qty = cart_items[item][4];
+							let cid = cart_items[item];
+							console.log("This is cart"+cid)
+							let uid = cart_items[item][1];
+							let rid = cart_items[item][3];
+							let FOODid = cart_items[item][2];
+							myupdatingdiv = `
+                                    <div class="row mb-0 mt-sm-0 align-items-center">
+                                        <div class="pr-0 col-xl-6 col-5">
+                                            <h4>${cid}</h4>
+                                        </div> 
+                                        <div class="qty-custom-width count mt-0 pl-2 pr-2 col-md-auto">
+                                            
+                                                <button type="button" id="negative{{c.id}}" data-action="minus" class="icon-remove pr-0 button1 update-cart"
+                                                 foodId = {{c.id}} cartfoodid = {{food.id}} {% if c.number < 2 %} disabled {% endif %} ></button>
+                                                <strong style="padding-left: 10px;" >{{c.number}}</strong>
+                                                <button type="button" id="positive" cartfoodid = {{food.id}} data-action="plus" class="icon-add pr-0 button2 update-cart" foodId = {{c.id}}></button>
+                                        </div> 
+                                        <div class="prc-custom-width text-right pl-0 col-md-auto">
+                                            <p id="food{{food.id}}">Rs.100</p>
+                                        </div>
+                                    </div> 
+                                    <div class="row mt-1">
+                                        <div class="pr-0 col">
+                                            <a href="#" target="_self" data-action="remove" class="delete-note remove-cart" foodId = {{c.id}}>
+                                                    Remove
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                     <!---->`
+									 $('#updatingDiv').append(myupdatingdiv);
+						}
+						$('#cart_no').text(data.cart_count);
+					}
+				})
+		});
+	</script>
+	<script>
+
+			$(document).ready(function () {
+				$('[data-toggle="popover"]').popover();
+				document.getElementById("popcart").setAttribute('data-content', '<h5>Cart for your items in my shopping cart</h5>');
+			});
+		</script>
+	{% endif %}
+
+
+	<!-- js for sending local data -->
+
+	<script type="text/javascript">
+		var user = '{{request.user}}';
+		function getToken(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie !== '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = cookies[i].trim();
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+		var csrftoken = getToken('csrftoken');
+
+	</script>
+
+
+	<!-- <script>
+		$('#popcart').popover();
+		document.getElementById("popcart").setAttribute('data-content', '<h5>Cart for your items in my shopping cart</h5>');
+	</script> -->
+	<script type="text/javascript" src="{% static 'core/js/main.js' %}"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
+	<script src="https://cdn.datatables.net/responsive/2.2.7/js/dataTables.responsive.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+	<script src="https://cdn.datatables.net/datetime/1.0.3/js/dataTables.dateTime.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
+	<script type="text/javascript" src="{% static 'core/js/bootstrap.min.js' %}"></script>
+	<script>	
+		var minDate, maxDate;
+		// Custom filtering function which will search data in column four between two values
+		$.fn.dataTable.ext.search.push(
+			function( settings, data, dataIndex ) {
+				var min = minDate.val();
+				var max = maxDate.val();
+				var date = new Date( data[4] );
+		
+				if (
+					( min === null && max === null ) ||
+					( min === null && date <= max ) ||
+					( min <= date   && max === null ) ||
+					( min <= date   && date <= max )
+				) {
+					return true;
+				}
+				return false;
+			}
+		);
+		$(document).ready(function() {
+			    // Create date inputs
+		minDate = new DateTime($('#min'), {
+			format: 'MMMM Do YYYY '
+		});
+		maxDate = new DateTime($('#max'), {
+			format: 'MMMM Do YYYY'
+		});
+		var dataTable = $('#filtertable').DataTable({
+			"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+			info: true,
+        	autoWidth: true,
+			responsive:true,
+			dom: 'Blrtip',
+			buttons: [
+				'copy', 'csv', 'excel', 'pdf', 'print'
+			],
+		});
+		$("#filterstatus").on('change',function(){
+			var selectedValue = $(this).val();
+			console.log(selectedValue);
+			var tableColumns = $("#filtertable thead th");
+			tableColumns.each(function(i){
+				console.log(i);
+				if($(this).text() == 'Status'){
+					statusindex = tableColumns.index(this);
+				}
+			})
+			console.log("Yo ma ho "+statusindex);
+			dataTable.column(statusindex).search(selectedValue).draw();
+
+		});
+
+		$('filtertable_length').addClass('custom-select form-control');
+		$("#filterbox").keyup(function(){
+			dataTable.search(this.value).draw();
+		});
+		$('#min, #max').on('change', function () {
+        dataTable.draw();
+    });
+	} );
+	</script>
+
+</body>
+
+</html>

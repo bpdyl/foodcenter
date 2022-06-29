@@ -1,0 +1,38 @@
+{% extends 'restaurants/base.html' %}
+{% block restaurants_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style> 
+    #leftbox {
+        float:left; 
+        width:20%;
+        height:280px;
+    }
+    #rightbox{
+        float:left;
+        width:25%;
+        height:280px;
+    }
+</style> 
+{% endblock restaurants_head%}
+{% load crispy_forms_tags %}
+{% block restaurants_body %}
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-5">
+        <div class="jumbotron">
+        <h1 class="display-4" style=" font-display: inherit; color: royalblue;">{{title}}</h1>
+        <table class="table table-borderless">
+            <p class="text-danger" style="font-size: 25px; font-family: fantasy;">Are you sure want to delete "{{menu.menu_name}}"?</p>
+            <form method="post" action="{% url 'delete_menu' menu.id %}" class="delete-form">
+                {% csrf_token %}
+                <div id="leftbox">
+                <a class="btn btn-success" href="{% url 'menu_list' %}">Cancel</a>
+                </div>
+                <div id="rightbox">
+                <button type="submit" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-trash"></span>
+                    Delete 
+                    </button>
+                    </div>
+            </form>     
+        </table>
+{% endblock %}

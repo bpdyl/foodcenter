@@ -1,0 +1,73 @@
+body, html {
+  height: 100%;
+}
+body{
+	background-image: url('../images/login_background2.jpg');
+	/* -ms-filter: drop-shadow(8px 8px 10px gray);
+	filter:drop-shadow(8px 8px 10px gray); */
+	opacity: 95%;
+	height: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+	background-attachment: fixed;
+}
+
+@font-face {
+    font-family: 'stormextrabold';
+    src: url('../fonts/storeb__-webfont.woff2') format('woff2'),
+         url('../fonts/storeb__-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+.custom-class{
+	color: rgb(7, 6, 6);
+	font-style: oblique;
+	font-family: cursive;
+}
+.signup_form{
+	padding: 5px;
+	background-color: rgb(252, 251, 248);
+}
+.signup_form button{
+	color: #fff;
+	background-color: #271a1e;
+	border:1px solid #231f20;
+	border-radius: 3px;
+	color: #f4f4f4;
+	height: 40px;
+	width: 80px;
+	font-size: 17px;
+}
+.subtitle
+{
+	color: #231f20; 
+	border-bottom: 1px solid #231f20;
+	text-align: left;
+}
+h2{
+	margin: 0;
+	padding: 0;
+	font-family: stormextrabold;
+	color: #231f20;
+	letter-spacing: 1px;
+}
+
+.signup_form button:hover{
+	background-color: #29d15b;
+	border:1px solid #1cb38d;
+	color: #ffffff;
+}
+
+.signup_form small{
+	float: right;
+	margin-top: 100px;
+	color: #d82eee;
+}
+
+.signup_form small a{
+	color: #161b19;
+}

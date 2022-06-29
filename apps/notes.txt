@@ -1,0 +1,4 @@
+if you make user as primary key in restaurant you need to change foodModel views as request.user only not request.user.restaurant
+and similarly there are few more changes you must do for customuser model as well 
+
+if you create instance of any form in views.py then you must pass that instance to the template .html file if you want it to appear as the way you have mentioned it's fields but you can customize it with by specifying the attribute fields  

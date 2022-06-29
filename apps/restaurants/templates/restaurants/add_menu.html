@@ -1,0 +1,44 @@
+{% extends 'restaurants/new_base.html' %}
+{% block restaurants_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    .error{
+    font-size: 16px;
+    width: 100%;
+    color: red;
+}
+input[type = text], textarea{
+    width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid rgb(133, 131, 131);
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow:4px 6px 20px rgb(182, 169, 169) ;
+}
+
+</style>
+{% endblock restaurants_head%}
+{% load crispy_forms_tags %}
+{% block restaurants_body %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h2 class="m-0 font-weight-bold text-primary">{{ title }}</h2>
+    </div>
+    <div class="card-body">
+            <div class="flex-container">
+            <div class="float-child">
+            <form action="." method="post">
+                {% csrf_token %}
+                {{form.non_field_errors}}
+                {{ form.menu_name | as_crispy_field }}
+                <br>
+                {{ form.menu_description | as_crispy_field}}
+                <button type="submit" class="btn btn-success"><i class="fas "></i>Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock restaurants_body %}

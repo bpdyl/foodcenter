@@ -1,0 +1,333 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load app_tags %}
+{% block core_head %}
+<style>
+body{
+    background-image: linear-gradient(to bottom left,rgb(255, 255, 255),#fffffe),linear-gradient(#bbb7b3,#cab097);
+}
+/* .container {
+  max-width: 960px;
+} */
+.error{
+    font-size: 16px;
+    color:rgb(235, 48, 48);
+    font-weight:normal;
+}
+.boxed {
+    padding: 0px 8px 0 8px;
+    background-color: #4bb8a9;
+    color: white
+}
+
+.boxed-1 {
+    padding: 0px 8px 0 8px;
+    color: black !important;
+    border: 1px solid #aaaa
+}
+
+.bell {
+    opacity: 0.5;
+    cursor: pointer
+}
+.card{
+    box-shadow: 0 0 20px rgba(145, 142, 142, 0.884);
+    border-radius: 10px;
+}
+.card .card-title{
+    text-align: center;
+}
+.lh-condensed { line-height: 1.25; }
+.StripeElement{
+    box-sizing: border-box;
+    height: 40px;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 1px 3px 0 red;
+    -webkit-transition: box-shadow 150mx ease;
+    transition: box-shadow 150ms ease;
+}
+.StripeElement--focus{
+    box-shadow: 0 1px 3px 0 #cfd7df;;
+}
+.StripeElement--invalid{
+    border-color: #e73131;
+}
+.StripeElement--webkit-autofill{
+    background-color: #fefde5 !important;
+}
+@media (min-width: 1200px) {
+    .container{
+        min-width: 1200px;
+    }
+}
+@media (min-width: 1200px) {
+    .user-info{
+        max-width: 700px;
+    }
+}
+@media (min-width: 1200px) {
+    .order-summary{
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 1000px) {
+    .order-summary, .checkoutform{
+        width: 100%;
+    }
+}
+</style>
+{% endblock core_head %}
+
+{% block core_body %}
+<div class="container">
+    {% if allfoods %}
+    <div class="py-2 text-center">
+        <h2>Checkout form</h2>
+        <h3 class="lead">Enter your address and other details below.</h3>
+    </div>
+    <div class="card row user-info" style="margin-bottom: 1%;">
+        <div class="card-body col-md-7">
+            <h3>Logged in as</h3>
+            <h4>{{request.user.first_name}} {{request.user.last_name}}</h4>
+            <h5>Phone: {{request.user.customer.phone}}</h5>
+            <h5>Email: {{request.user.email}}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4.5 order-md-2 mb-4 order-summary" style="margin-left: 1%;">
+            <div class="card border-0 ">
+                <div class="card-header card-2">
+                    <p class="card-text text-muted mt-md-4 mb-2 space">ORDER SUMMARY</p>
+                    <hr class="my-2">
+                </div>
+                <div class="card-body pt-0">
+                    {% for cart,food in allfoods %}
+                    <div class="row justify-content-between">
+                        <div class="col-auto col-md-7">
+                            <div class="media flex-column flex-sm-row"> <img class="img-fluid" src="{{food.food_image.url}}" style="width: 100px;height: 100px;border-radius: 10px;">
+                                <div class="media-body my-auto">
+                                    <div class="row ">
+                                        <div class="col-auto">
+                                            <p class="mb-0"><b>{{food.food_name}}</b></p><small class="text-muted">{{food.food_description}}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" pl-0 flex-sm-col col-auto my-auto">
+                            <p class="boxed-1">{{cart.number}}</p>
+                        </div>
+                        <div class=" pl-0 flex-sm-col col-auto my-auto ">
+                            <p><b>Rs. {{cart.number | multiply:food.food_price}}</b></p>
+                        </div>
+                    </div>
+                    <hr class="my-2">
+                    {% endfor %}
+                    <div class="row ">
+                        <div class="col">
+                            <div class="row justify-content-between">
+                                <div class="col-4">
+                                    <p class="mb-1"><b>Subtotal</b></p>
+                                </div>
+                                <div class="flex-sm-col col-auto">
+                                    <p class="mb-1"><b>Rs. {{subtotal}}</b></p>
+                                </div>
+                            </div>
+                            <div class="row justify-content-between">
+                                <div class="col">
+                                    <p class="mb-1"><b>Delivery Charge</b></p>
+                                </div>
+                                <div class="flex-sm-col col-auto">
+                                    <p class="mb-1"><b>Rs. {{delivery_charge}}</b></p>
+                                </div>
+                            </div>
+                            <div class="row justify-content-between">
+                                <div class="col-4">
+                                    <p><b>Total</b></p>
+                                </div>
+                                <div class="flex-sm-col col-auto">
+                                    <p class="mb-1"><b>Rs. {{total}}</b></p>
+                                </div>
+                            </div>
+                            <hr class="my-0">
+                        </div>
+                    </div>
+                    <div class="row mb-5 mt-4 ">
+                        <div class="col-md-7 col-lg-6 mx-auto"><button type="button" class="btn btn-block btn-outline-primary btn-lg">ADD GIFT CODE</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card col-md-7 order-md-1 checkoutform">
+            <h4 class="mb-3 card-title">Delivery address</h4>
+            <form method="POST" class="card-body needs-validation"  id="payment-form" novalidate="">
+                {% csrf_token %}
+                {{address_form.non_field_errors}}
+                <div class="hideable_address_form">
+                    <div class="mb-3">
+                        {{address_form.address|as_crispy_field}}
+                        <div class="invalid-feedback"> Please enter your delivery address. </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{address_form.area|as_crispy_field}}
+                            <div class="invalid-feedback"> Please mention your area. </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{address_form.city|as_crispy_field}}
+                        <div class="invalid-feedback"> City required </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{address_form.state|as_crispy_field}}
+                            <div class="invalid-feedback"> Please choose a state. </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{address_form.zipcode|as_crispy_field}}
+                            <div class="invalid-feedback"> Zip code required. </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{address_form.alternate_phone|as_crispy_field}}
+                    </div>
+                    
+                    <hr class="mb-4">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="set_default_address" name="set_default_address">
+                        <label class="custom-control-label" for="set_default_address">Save as default address. </label>
+                    </div>
+                </div>
+                {% if default_address %}
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="use_default_address" name="use_default_address">
+                    <label class="custom-control-label" for="use_default_address">Use default address: {{ default_address.street_address|truncatechars:15 }}</label>
+                </div>
+                {% endif %}
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1" name="pay_mode">
+                    <label class="custom-control-label" for="customSwitch1">Cash on Delivery</label>
+                </div>
+                <hr class="mb-4">
+                <div class="form-group col-md-6 hideable_stripe_form">
+                    <label for="card-element">
+                        Credit or debit card
+                    </label>
+                    <div id="card-element">
+                        <!-- A stripe element will be inserted here.-->
+                    </div>
+                    <!-- Used to display form errors. -->
+                    <div id="card-errors" role="alert"></div>
+                </div>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="card bg-danger text-white shadow" style="margin-top: 20px;">
+        <div class="card-body">
+            <h3 style="padding-left: 15%;">Oops You haven't meet the minimum requirement to order!!</h3>
+        </div>
+    </div>
+    {% endif %}
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">© 2021 FoodCenter</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="#">Privacy</a></li>
+            <li class="list-inline-item"><a href="#">Terms</a></li>
+            <li class="list-inline-item"><a href="#">Support</a></li>
+        </ul>
+    </footer>
+</div>
+{% block core_script %}
+<script src="https://js.stripe.com/v3"></script>
+<script>
+var stripe = Stripe('{{ stripe_pub_key }}');
+var elements = stripe.elements();
+
+var style = {
+    base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder':{
+            color: 'black'
+        }
+    },
+    invalid:{
+        color: 'red',
+        iconColor: 'red'
+    }
+};
+//create an instancee of the card element
+var card = elements.create('card',{style: style});
+
+//add an instance of the card element into the `card-element` <div>
+card.mount('#card-element');
+// handle real-time validation errors from the card element
+card.on('change',function(event){
+    var displayError = document.getElementById('card-errors');
+    if(event.error){
+        displayError.textContent = event.error.message;
+    }else{
+        displayError.textContent = '';
+    }
+});
+//handle form submission
+var form = document.getElementById('payment-form');
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    stripe.createToken(card).then(function(result) {
+        if (result.error) {
+            var errorElement = document.getElementById('card-errors');
+            errorElement.textContent = result.error.message;
+        } else {
+            stripeTokenHandler(result.token);
+        }
+    });
+});
+
+function stripeTokenHandler(token) {
+    var form = document.getElementById('payment-form');
+    var hiddenInput = document.createElement('input');
+    hiddenInput.setAttribute('type', 'hidden');
+    hiddenInput.setAttribute('name', 'stripeToken');
+    hiddenInput.setAttribute('value', token.id);
+    form.appendChild(hiddenInput);
+
+    form.submit();
+}
+</script>
+<script>
+    var hideable_address_form = $('.hideable_address_form');
+    var use_default_address = document.querySelector("input[name = use_default_address]");
+    use_default_address.addEventListener('change', function(){
+        if(this.checked){
+            hideable_address_form.hide();
+        }else{
+            hideable_address_form.show();
+        }
+    })
+</script>
+<script>
+    var hideable_stripe_form = $('.hideable_stripe_form');
+    var payment_mode = document.querySelector("input[name = pay_mode]");
+    payment_mode.addEventListener('change',function(){
+        if(this.checked){
+            hideable_stripe_form.hide();
+        }else{
+            hideable_stripe_form.show();
+        }
+    })
+</script>
+<!--  -->
+{% endblock core_script %}
+{% endblock core_body %}

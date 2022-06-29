@@ -1,0 +1,97 @@
+{% extends 'restaurants/new_base.html' %}
+{% block restaurants_head %}
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+<style>
+    .float-child {
+        flex: 1;
+}  
+.float-child:first-child{
+    margin-right: 120px;
+}
+.flex-container {
+    display: flex;
+}
+.error{
+    font-size: 16px;
+    width: 100%;
+    color: red;
+}
+input[type = text], select{
+    width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: block;
+    border: 1px solid rgb(133, 131, 131);
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow:4px 6px 20px rgb(182, 169, 169) ;
+}
+input[type = number]{
+    width: 50%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid rgb(133, 131, 131);
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow:4px 6px 20px rgb(177, 158, 158) ;
+
+}
+</style>
+{% endblock restaurants_head%}
+{% load crispy_forms_tags %}
+{% block restaurants_body %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h2 class="m-0 font-weight-bold text-primary">{{ title }}</h2>
+    </div>
+    <div class="card-body">
+            <div class="flex-container">
+            <div class="float-child">
+                <div class="col-xl-12">
+            <form style="width: 100%;" action="." method="post" enctype="multipart/form-data">
+                
+                {% csrf_token %}
+                {{form.non_field_errors}}
+                <div class="form-group">
+                {{ form.food_name | as_crispy_field}}
+            </div>
+                <div class="form-group">
+                    <label for="Menu">Menu</label>
+                    <select name="menu" id="" class="form-control" style="width:50%; height: 50px;" required>
+                        <option value="">Please Select</option>
+                        {% for m in menu%}
+                        <option name="menu" value="{{m.id}}" {% if m == foods.menu %}selected{% endif %}>{{m.menu_name}}</option>
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{message.tags}}">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group row">
+                    {{ form.food_price | as_crispy_field}}
+                </div>
+                <div class="form-group row">
+                    {{ form.food_image | as_crispy_field}}
+                </div>
+                <div class="form-group row">
+                    {{ form.food_description | as_crispy_field}}
+                </div>
+                <button type="submit" style="margin-top: 10px;" class="btn btn-success"><i class="fas "></i>Submit</button>
+            </form>
+        </div>
+        </div>
+        {% if foods %}
+        <div class="float-child">
+                
+                <h3 style="font-weight: bolder; color: rgb(83, 83, 201);">Current Image</h3>
+                <img class="foodimg" src="{{foods.food_image.url}}" style="width: 300px;height: 300px; border-radius: 5px; margin-top: 20px; margin-bottom: 30px; filter: drop-shadow(0px 10px 3px black);" alt="image">
+                
+            </div>
+            {% endif %}
+        </div>
+        </div>
+    </div>
+{% endblock restaurants_body %}

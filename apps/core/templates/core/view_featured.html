@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="latest-products">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="section-heading">
+            <h2>{{feat}}</h2>
+            <hr>
+          </div>
+        </div>
+        {% for f in featured %}
+        <div class="col-md-3">
+          <div class="product-item">
+            <div class="img-hover-zoom">
+            <a href="{% url 'view_detail' f.restaurant.id %}"><img src="{{f.restaurant.rest_photo.url}}" class="img-responsive img-fluid"  alt=""></a>
+            </div>
+            <div class="down-content">
+              <a href="{% url 'view_detail' f.restaurant.id %}"><h4>{{f.restaurant.rest_name}}</h4></a>
+  
+              <h6>{{f.restaurant.rest_opentime}} - {{f.restaurant.rest_closetime}}</h6>
+  
+              <p>{{f.restaurant.rest_Address}}</p>
+              {% if f.restaurant.check_time and f.restaurant.status == "open" %}
+              <small style="color: rgb(5, 184, 5); font-size: 17px;">
+                 <i class="fa fa-clock-o" aria-hidden="true"></i> Opened 
+                  <small style="color: black;font-size: 14px;">{{f.restaurant.rest_opentime}} - {{f.restaurant.rest_closetime}}</small>
+                  <br>
+              </small>
+              {% else %}
+              <p style="color: red;"><i class="fa fa-clock-o" aria-hidden="true"></i> Closed</p>
+              {% endif %}
+              <small>
+                   <strong title="City"><i class="fa fa-map-marker"></i> {{f.restaurant.city}}</strong> &nbsp;&nbsp;&nbsp;&nbsp;
+              </small>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

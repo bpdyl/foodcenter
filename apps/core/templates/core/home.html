@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+{% block navsearch %}{% endblock %}
+{% load static %}
+{% block title %} Welcome | {% endblock %}
+<!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous"> -->
+{% block main_head %}
+
+<style>
+#home {
+    padding: 0;
+  }
+  
+  #home h1 {
+    color: #ffffff;
+  }
+
+  @media (min-width: 768px) {
+    .home-slider .col-md-6 {
+      padding-left: 0;
+    }
+  }
+
+  .home-slider .caption {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    background-color: rgba(20,20,20,0.2);
+    height: 100%;
+    color: #fff;
+    cursor: e-resize;
+  }
+  .caption h3 a { color: #FFF; }
+  .caption h3 a:hover { color: #FF3; }
+  .packages{
+    padding:120px 0 90px;
+}
+
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="foodouter">
+  <img src="/static/core/foodcenter.jpg" class="foodouter-img" alt="" srcset="">
+  <div class="search-outer">
+    <div class="d-flex justify-content-center header-flex">
+      <p class="zomato">FoodCenter</p>
+  </div>
+    <div class="col-md-12 col-sm-6 ">
+      <form action="/search/index">
+      <input type="text" name="query" placeholder="Search for dishes or restaurants... or leave it blank to browse all" class="search-box" />
+      <button class="section-btn btn search-btn smoothScroll" type="submit">Find Restaurant</button>
+    </form>
+ </div>
+  </div>
+</div>
+<hr>
+<div class="latest-products">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="section-heading">
+          <h2>Featured Restaurants</h2>
+          <hr>
+          <a href="/restaurants/featured">view more <i class="fa fa-angle-right"></i></a>
+        </div>
+      </div>
+      {% for f in featured %}
+      <div class="col-md-3">
+        <div class="product-item">
+          <div class="img-hover-zoom">
+          <a href="{% url 'view_detail' f.restaurant.id %}"><img src="{{f.restaurant.rest_photo.url}}" class="img-responsive img-fluid"  alt=""></a>
+          </div>
+          <div class="down-content">
+            <a href="{% url 'view_detail' f.restaurant.id %}"><h4>{{f.restaurant.rest_name}}</h4></a>
+
+            <p>{{f.restaurant.rest_Address}}</p>
+            {% if f.restaurant.check_time and f.restaurant.status == "open" %}
+            <small style="color: rgb(5, 184, 5); font-size: 16px;">
+               <i class="fa fa-clock-o" aria-hidden="true"></i> Opened 
+                <small style="color: rgb(100, 97, 97);font-size: 14px;">{{f.restaurant.rest_opentime}} - {{f.restaurant.rest_closetime}}</small>
+                <br>
+            </small>
+            {% else %}
+            <p style="color: red;"><i class="fa fa-clock-o" aria-hidden="true"></i> Closed</p>
+            {% endif %}
+            <small>
+                 <strong title="City"><i class="fa fa-map-marker"></i> {{f.restaurant.city}}</strong> &nbsp;&nbsp;&nbsp;&nbsp;
+            </small>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

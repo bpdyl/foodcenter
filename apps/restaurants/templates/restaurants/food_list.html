@@ -1,0 +1,157 @@
+{% extends 'restaurants/base.html' %}
+{% load static %}
+{% block restaurants_head %}
+{% endblock restaurants_head%}
+<style>
+    .foodimg{
+        height: 200px;
+        width: 200px;
+        box-shadow: maroon;
+    }
+    #myfoodlist th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% block restaurants_body %}
+<div class="container">
+    <div class="col-md-10 offset-md-1 mt-9">
+        <div class="jumbotron">
+            <a href="{% url 'add_food' %}"><button type="submit" class="btn btn-success"><i class="fas "></i>Add</button></a>
+        <h1 class="display-4" style=" font-display: inherit; color: royalblue;">{{title}}</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="col-md-6">
+                </div>
+            </div>
+        </div>
+        
+    <div class="app-table">
+        <table id="myfoodlist" class="table table-hover" style="border: 2px solid rgb(234, 230, 253);">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{message.tags}}">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+            {% if food_list %}
+                <thead class="border-bottom font-weight-bold" style="background-color: rgb(105, 65, 179); color: white;">
+                    <tr>
+                        <td>SN</td>
+                        <td>Image</td>
+                        <td>Food Name</td>
+                        <td>Food Price</td>
+                        <td>Food Menu</td>
+                        <td>Food Description</td>
+                        <td>Action</td>
+                    </tr>
+                </thead>
+                <tbody style="background-color: rgb(255, 255, 255);">
+                    {% for food in food_list %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td><img class="foodimg" src="{{food.food_image.url}}" style="width: 85px; height:80px; border-radius: 5px; filter: drop-shadow(0px 10px 3px black);" alt=""></td>
+                            <td>{{food.food_name}}</td>
+                            <td>{{food.food_price}}</td>
+                            <td>{{food.menu.menu_name}}</td>
+                            <td>{{food.food_description}}</td>
+                            <td>
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                <a href="{% url 'edit_food' food.id %}" class="btn text-secondary px-0">
+                                    <i class="fa fa-edit" style="font-size: 25px; color: blueviolet;text-shadow:2px 2px 4px #000000;"></i>
+                                </a> |
+                                
+                                <a id="deletefood-{{food.id}}" restId="{{restaurant.id}}" foodId = "{{food.id}}" class="btn text-secondary px-0 delfood">
+                                    <i class="fa fa-trash" style="font-size: 25px; color:red; text-shadow:2px 2px 4px black;"></i>
+                                </a>
+                            </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                {% else %}
+                <div class="row" style="background-color: wheat;padding: 10px;">
+                <p style="font-weight: bold;color: rgb(163, 30, 30);margin-left: 30%;">No food items found! Shall we add some</p>
+                </div>
+            {% endif %}
+        </table>
+    </div>
+</div>
+</div>
+</div>
+
+{% block restaurants_js %}
+<!-- <script>
+$(document).ready( function () {
+    $('#myfoodlist').DataTable();
+} );
+</script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+<script>
+    
+    $('.delfood').unbind('click').click(function(e){
+        var delid = $(this).attr("id");
+        var foodid = $(this).attr("foodId");
+        var restid = $(this).attr("restId");
+        let csr = $("input[name=csrfmiddlewaretoken").val();
+        mythis = this;
+        const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timerProgressBar: true,
+                        timer: 2000
+                    });
+        console.log(delid)
+        swal({
+            "title":"Do you really want to delete this food item?",
+            "icon":"error",
+            buttons: ["No","Yes"],
+            dangerMode: true,
+		})
+        .then(function(result){
+            if(result){
+            console.log("Yes delete it");
+            $.ajax(
+                {
+                    type:"POST",
+                    url:"{% url 'delete_food' %}",
+                    data:{
+                        foodId: foodid,
+                        restId: restid,
+                        csrfmiddlewaretoken: csr,
+                    },
+                    success:function(data){
+                        console.log(data);
+                        if(data.status == 1){
+                            Toast.fire({
+                            icon: 'success',
+                            title: 'Food item deleted succesfully'
+                        })
+                        $(mythis).closest("tr").fadeOut();
+                        }
+                        if(data.status == 0){
+                            Toast.fire({
+                                icon: 'error',
+                                title: 'Sorry some error occurred while deleting food item',
+                            })
+                        }
+                    }
+                    
+                }
+            )
+        }
+        })
+    })
+</script>
+{% endblock restaurants_js %}
+
+        
+
+{% endblock restaurants_body %}
